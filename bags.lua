@@ -7,7 +7,8 @@ unified_inventory.register_page("bags", {
 	get_formspec = function(player)
 		local player_name = player:get_player_name()
 		local formspec = "background[0.06,0.99;7.92,7.52;ui_bags_main_form.png]"
-		formspec = formspec.."label[0,0;Bags]"
+		formspec = formspec.."image[0,0;1,1;ui_bags_icon.png]"
+		formspec = formspec.."label[1,0;Bags]"
 		formspec = formspec.."button[0,2;2,0.5;bag1;Bag 1]"
 		formspec = formspec.."button[2,2;2,0.5;bag2;Bag 2]"
 		formspec = formspec.."button[4,2;2,0.5;bag3;Bag 3]"

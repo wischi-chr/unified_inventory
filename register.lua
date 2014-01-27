@@ -120,7 +120,8 @@ unified_inventory.register_page("craft", {
 		local player_name = player:get_player_name()
 		local formspec = "background[0,1;8,3;ui_crafting_form.png]"
 		formspec = formspec.."background[0,4.5;8,4;ui_main_inventory.png]"
-		formspec = formspec.."label[0,0;Crafting]"
+		formspec = formspec.."image[0,0;1,1;ui_craft_icon.png]"
+		formspec = formspec.."label[1,0;Crafting]"
 		formspec = formspec.."listcolors[#00000000;#00000000]"
 		formspec = formspec.."list[current_player;craftpreview;6,1;1,1;]"
 		formspec = formspec.."list[current_player;craft;2,1;3,3;]"
@@ -139,14 +140,15 @@ unified_inventory.register_page("craftguide", {
 		local player_name = player:get_player_name()
 		local formspec = "background[0,1;8,3;ui_craftguide_form.png]"
 		formspec = formspec.."background[0,4.5;8,4;ui_main_inventory.png]"
-		formspec = formspec.."label[0,0;Crafting Guide]"
+		formspec = formspec.."image[0,0;1,1;ui_craftguide_icon.png]"
+		formspec = formspec.."label[1,0;Crafting Guide]"
 		formspec = formspec.."listcolors[#00000000;#00000000]"
 		formspec = formspec.."list[detached:"..player_name.."craftrecipe;output;6,1;1,1;]"
 		formspec = formspec.."label[6,3.35;Method:]"
 		local item_name = unified_inventory.current_item[player_name]
 		local craft = nil
 		if item_name then
-			formspec = formspec.."textarea[0.3,0.6;10,1;;Result: "..item_name..";]"
+			formspec = formspec.."textarea[1.3,0.6;10,1;;Result: "..item_name..";]"
 			local alternates = 0
 			local alternate = unified_inventory.alternate[player_name]
 			local crafts = unified_inventory.crafts_table[item_name]
