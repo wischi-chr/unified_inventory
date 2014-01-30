@@ -1,33 +1,72 @@
+unified_inventory.hud_colors = {
+			{"#FFFFFF", 0xFFFFFF, "White"},
+			{"#DBBB00", 0xf1d32c, "Yellow"},
+			{"#DD0000", 0xDD0000, "Red"},
+			{"#2cf136", 0x2cf136, "Green"},
+			{"#2c4df1", 0x2c4df1, "Blue"},		
+			}
+unified_inventory.hud_colors_max = #unified_inventory.hud_colors
+			
 unified_inventory.register_page("waypoints", {
 	get_formspec = function(player)
-		local player_name = player:get_player_name()
-		local need_save = false
 		local waypoints = datastorage.get_container (player, "waypoints")
 		local formspec = "background[0,4.5;8,4;ui_main_inventory.png]"..
 			"image[0,0;1,1;ui_waypoints_icon.png]"..
 			"label[1,0;Waypoints]" 
+
+		-- Tabs buttons:
+		local i
 		for i = 1, 5, 1 do
-			formspec = formspec .. "label[0,".. 0.2 + i*0.7 ..";".. i ..".]" 
-			if waypoints[i].edit then 
-				formspec = formspec .. 
-					"image_button[1.7,".. 0.2 + i*0.7 ..";.8,.8;ui_ok_icon.png;confirm_rename".. i .. ";]"..
-					"field[2.7,".. 0.5 + i*0.7 ..";5,.8;rename_box".. i ..";;".. waypoints[i].name .."]"
+			if i == waypoints.selected then
+				formspec = formspec ..
+					"image_button[0.0,".. 0.2 + i*0.7 ..";.8,.8;ui_blue_icon_background.png^ui_"..
+						i .."_icon.png;select_waypoint".. i .. ";]"
 			else
 				formspec = formspec ..
-				 	"image_button[1.7,".. 0.2 + i*0.7 ..";.8,.8;ui_pencil_icon.png;rename_waypoint".. i .. ";]".. 
-					"label[3,".. 0.2 + i*0.7 ..";(".. 
-					waypoints[i].world_pos.x .. "," ..
-					waypoints[i].world_pos.y .. "," ..
-					waypoints[i].world_pos.z .. "), "..
-					waypoints[i].name .. "]"
+					"image_button[0.0,".. 0.2 + i*0.7 ..";.8,.8;ui_"..
+					i .."_icon.png;select_waypoint".. i .. ";]"
 			end
-			formspec = formspec .. "image_button[1.0,".. 0.2 + i*0.7 ..";.8,.8;ui_waypoint_set_icon.png;set_waypoint".. i .. ";]"
-			if not waypoints[i].active then  
-				formspec = formspec .. "image_button[0.3,".. 0.2 + i*0.7 ..";.8,.8;ui_off_icon.png;toggle_waypoint".. i .. ";]"
-			else 
-				formspec = formspec .. "image_button[0.3,".. 0.2 + i*0.7 ..";.8,.8;ui_on_icon.png;toggle_waypoint".. i .. ";]"
-			end
+		end
+		
+		i = waypoints.selected
+		
+		-- Main buttons:
+		formspec = formspec .. 
+				"image_button[4.5,3.7;.8,.8;ui_waypoint_set_icon.png;set_waypoint".. i .. ";]"
+
+		if waypoints[i].active then  
+			formspec = formspec ..
+				"image_button[5.2,3.7;.8,.8;ui_on_icon.png;toggle_waypoint".. i .. ";]"
+		else 
+			formspec = formspec ..
+				"image_button[5.2,3.7;.8,.8;ui_off_icon.png;toggle_waypoint".. i .. ";]"
 		end	
+
+		if waypoints[i].display_pos then
+			formspec = formspec .. 
+				"image_button[5.9,3.7;.8,.8;ui_green_icon_background.png^ui_xyz_icon.png;toggle_display_pos".. i .. ";]"
+		else
+			formspec = formspec .. 
+				"image_button[5.9,3.7;.8,.8;ui_red_icon_background.png^ui_xyz_icon.png;toggle_display_pos".. i .. ";]"
+		end
+
+		formspec = formspec .. 
+				"image_button[6.6,3.7;.8,.8;ui_circular_arrows_icon.png;toggle_color".. i .. ";]"..
+				"image_button[7.3,3.7;.8,.8;ui_pencil_icon.png;rename_waypoint".. i .. ";]"
+		
+		-- Waypoint's info:	
+		if waypoints[i].active then
+			formspec = formspec .. 	"label[1,0.8;Waypoint active]"
+		else 
+			formspec = formspec .. 	"label[1,0.8;Waypoint inactive]"
+		end
+
+		formspec = formspec .. "label[1,1.3;World position: " .. 
+			minetest.pos_to_string(waypoints[i].world_pos) .. "]" ..
+			"label[1,1.8;Name: ]".. waypoints[i].name .. "]" ..
+			"label[1,2.3;Hud text color: " ..
+			unified_inventory.hud_colors[waypoints[i].color][3] .. "]"
+			
 		return {formspec=formspec}
 	end,
 })
@@ -37,28 +76,57 @@ unified_inventory.register_button("waypoints", {
 	image = "ui_waypoints_icon.png",
 })
 
+unified_inventory.update_hud = function (player, waypoint)	
+	local name
+	if waypoint.display_pos then
+		name = "(".. 
+			waypoint.world_pos.x .. "," ..
+			waypoint.world_pos.y .. "," ..
+			waypoint.world_pos.z .. ")"
+		if waypoint.name ~= "" then 	 
+			name = name .. ", " ..
+			waypoint.name
+		end
+	else
+		name = waypoint.name
+	end
+	if waypoint.active then
+		player:hud_remove(waypoint.hud)
+		waypoint.hud = player:hud_add({
+			hud_elem_type = "waypoint",
+			number = unified_inventory.hud_colors[waypoint.color][2] ,
+			name = name,
+			text = "m",
+			world_pos = waypoint.world_pos
+		})
+	else 
+		if waypoint.hud ~= nil then 
+			player:hud_remove(waypoint.hud)
+			waypoint.hud = nil
+		end
+	end
+end
+
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if formname ~= "" then
 		return
 	end
+
+	local update_formspec = false
+	local update_hud = false
+	
 	local waypoints = datastorage.get_container (player, "waypoints")		
 	for i = 1, 5, 1 do
+
+		if fields["select_waypoint"..i] then
+			waypoints.selected = i
+			update_formspec = true
+		end
+
 		if fields["toggle_waypoint"..i] then
 			waypoints[i].active = not (waypoints[i].active)
-			unified_inventory.set_inventory_formspec(player, "waypoints")
-			if waypoints[i].active == true then
-				waypoints[i].hud = player:hud_add({
-					hud_elem_type = "waypoint",
-					number = 0xFFFFFF ,
-					name = waypoints[i].name,
-					text = "m",
-					world_pos = waypoints[i].world_pos
-					})
-			else
-				if waypoints[i].hud ~= nil then 
-					player:hud_remove(waypoints[i].hud)
-				end
-			end	
+			update_hud = true
+			update_formspec = true
 		end
 		
 		if fields["set_waypoint"..i] then
@@ -67,55 +135,74 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			pos.y = math.floor(pos.y)
 			pos.z = math.floor(pos.z)
 			waypoints[i].world_pos = pos
-				if waypoints[i].active == true then
-					player:hud_remove(waypoints[i].hud)
-					waypoints[i].hud = player:hud_add({
-						hud_elem_type = "waypoint",
-						number = 0xFFFFFF ,
-						name = waypoints[i].name,
-						text = "m",
-						world_pos = waypoints[i].world_pos
-					})
-				end
-			unified_inventory.set_inventory_formspec(player, "waypoints")
+			update_hud = true
+			update_formspec = true
 		end
 		
 		if fields["rename_waypoint"..i] then
 			waypoints[i].edit = true
-			unified_inventory.set_inventory_formspec(player, "waypoints")
+			update_formspec = true
 		end
+
+		if fields["toggle_display_pos"..i] then
+			waypoints[i].display_pos = not waypoints[i].display_pos
+			update_hud = true
+			update_formspec = true
+		end
+
+		if fields["toggle_color"..i] then
+			local color = waypoints[i].color
+			color = color + 1
+			if color > unified_inventory.hud_colors_max then
+				color = 1
+			end
+			waypoints[i].color = color
+			update_hud = true
+			update_formspec = true
+		end
+
 		if fields["confirm_rename"..i] then
 			waypoints[i].edit = false
 			waypoints[i].name = fields["rename_box"..i] 
-			unified_inventory.set_inventory_formspec(player, "waypoints")
-			player:hud_remove(waypoints[i].hud)
-			if waypoints[i].active == true then	
-				waypoints[i].hud = player:hud_add({
-					hud_elem_type = "waypoint",
-					number = 0xFFFFFF ,
-					name = waypoints[i].name,
-					text = "m",
-					world_pos = waypoints[i].world_pos
-				})
-			end
+			update_hud = true
+			update_formspec = true
 		end
+
+		if update_hud then
+			unified_inventory.update_hud (player, waypoints[i])
+		end
+	
+		if update_formspec then
+			unified_inventory.set_inventory_formspec(player, "waypoints")
+		end
+	
 	end
 end)
 
 minetest.register_on_joinplayer(function(player)
 	local waypoints = datastorage.get_container (player, "waypoints")
+
+	-- Create new waypoints data
 	if waypoints[1] == nil then 
 		for i = 1, 5, 1 do
 			waypoints[i] = {
 			edit = false,
 			active = false,
+			display_pos = true,
+			color = 2,
 			name = "Waypoint ".. i,
 			world_pos = {x = 0, y = 0, z = 0},
 			}
 		end
 		datastorage.save_container(player)
 	end
-	for i = 1, 5, 1 do
-		waypoints[i].edit = false
-	end
+
+	-- Initialize waypoints
+	minetest.after(0.5, function()
+		waypoints.selected = 1
+		for i = 1, 5, 1 do
+			waypoints[i].edit = false
+			unified_inventory.update_hud (player, waypoints[i])		
+		end
+	end)
 end)
