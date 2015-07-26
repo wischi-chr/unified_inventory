@@ -25,11 +25,11 @@ function unified_inventory.get_formspec(player, page)
 
 	local formspec = "size[14,10]"
 	-- Background
-	formspec = formspec .. "background[-0.19,-0.25;14.4,10.75;ui_form_bg.png]"
+	formspec = formspec .. default.gui_bg .. default.gui_bg_img .. default.gui_slots
 
 	if unified_inventory.lite_mode then
 		formspec = "size[11,7.7]"
-		formspec = formspec .. "background[-0.19,-0.2;11.4,8.4;ui_form_bg.png]"
+		formspec = formspec .. default.gui_bg .. default.gui_bg_img .. default.gui_slots
 	end
 
 	local fsdata = nil
@@ -67,7 +67,6 @@ function unified_inventory.get_formspec(player, page)
 
 	if fsdata.draw_inventory ~= false then
 		-- Player inventory
-		formspec = formspec.."listcolors[#00000000;#00000000]"
 		formspec = formspec .. "list[current_player;main;0,"..(unified_inventory.formspec_y + 3.5)..";8,4;]"
 	end
 

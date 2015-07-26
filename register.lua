@@ -136,10 +136,8 @@ unified_inventory.register_button("clear_inv", {
 unified_inventory.register_page("craft", {
 	get_formspec = function(player, formspec)
 		local player_name = player:get_player_name()
-		local formspec = "background[0,"..unified_inventory.formspec_y..";8,3;ui_crafting_form.png]"
-		formspec = formspec.."background[0,"..(unified_inventory.formspec_y + 3.5)..";8,4;ui_main_inventory.png]"
+		local formspec = ""
 		formspec = formspec.."label[0,"..unified_inventory.form_header_y..";Crafting]"
-		formspec = formspec.."listcolors[#00000000;#00000000]"
 		formspec = formspec.."list[current_player;craftpreview;6,"..unified_inventory.formspec_y..";1,1;]"
 		formspec = formspec.."list[current_player;craft;2,"..unified_inventory.formspec_y..";3,3;]"
 		formspec = formspec.."label[7,"..(unified_inventory.formspec_y + 1.5)..";" .. S("Trash:") .. "]"
@@ -208,9 +206,8 @@ unified_inventory.register_page("craftguide", {
 		local player_name = player:get_player_name()
 		local player_privs = minetest.get_player_privs(player_name)
 		local formspec = ""
-		formspec = formspec.."background[0,"..(unified_inventory.formspec_y + 3.5)..";8,4;ui_main_inventory.png]"
+		formspec = formspec..""
 		formspec = formspec.."label[0,"..unified_inventory.form_header_y..";" .. S("Crafting Guide") .. "]"
-		formspec = formspec.."listcolors[#00000000;#00000000]"
 		local item_name = unified_inventory.current_item[player_name]
 		if not item_name then return {formspec=formspec} end
 
@@ -226,7 +223,6 @@ unified_inventory.register_page("craftguide", {
 			craft = crafts[alternate]
 		end
 
-		formspec = formspec.."background[0.5,"..(unified_inventory.formspec_y + 0.2)..";8,3;ui_craftguide_form.png]"
 		formspec = formspec.."textarea["..unified_inventory.craft_result_x..","..unified_inventory.craft_result_y
                            ..";10,1;;"..minetest.formspec_escape(role_text[dir]..": "..item_name)..";]"
 		formspec = formspec..stack_image_button(0, unified_inventory.formspec_y, 1.1, 1.1, "item_button_"
