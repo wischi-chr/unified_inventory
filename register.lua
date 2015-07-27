@@ -112,7 +112,7 @@ if not unified_inventory.lite_mode then
 	})
 end
 
-unified_inventory.register_button("clear_inv", {
+--[[unified_inventory.register_button("clear_inv", {
 	type = "image",
 	image = "ui_trash_icon.png",
 	tooltip = S("Clear inventory"),
@@ -131,7 +131,7 @@ unified_inventory.register_button("clear_inv", {
 		minetest.sound_play("trash_all",
 				{to_player=player_name, gain = 1.0})
 	end,
-})
+})]]--
 
 unified_inventory.register_page("craft", {
 	get_formspec = function(player, formspec)
@@ -229,10 +229,10 @@ unified_inventory.register_page("craftguide", {
 		                   .. rdir .. "_", ItemStack(item_name))
 
 		if not craft then
-			formspec = formspec.."label[5.5,"..(unified_inventory.formspec_y + 2.35)..";"
+			formspec = formspec.."label[6,"..(unified_inventory.formspec_y + 2.35)..";"
 			                   ..minetest.formspec_escape(no_recipe_text[dir]).."]"
-			local no_pos = dir == "recipe" and 4.5 or 6.5
-			local item_pos = dir == "recipe" and 6.5 or 4.5
+			local no_pos = dir == "recipe" and 5 or 7
+			local item_pos = dir == "recipe" and 7 or 5
 			formspec = formspec.."image["..no_pos..","..unified_inventory.formspec_y..";1.1,1.1;ui_no.png]"
 			formspec = formspec..stack_image_button(item_pos, unified_inventory.formspec_y, 1.1, 1.1, "item_button_"
 			                   ..other_dir[dir].."_", ItemStack(item_name))
@@ -248,16 +248,16 @@ unified_inventory.register_page("craftguide", {
 		local craft_type = unified_inventory.registered_craft_types[craft.type] or
 				unified_inventory.craft_type_defaults(craft.type, {})
 		if craft_type.icon then
-			formspec = formspec..string.format(" image[%f,%f;%f,%f;%s]",5.7,(unified_inventory.formspec_y + 0.05),0.5,0.5,craft_type.icon)
+			formspec = formspec..string.format(" image[%f,%f;%f,%f;%s]",6.2,(unified_inventory.formspec_y + 0.05),0.5,0.5,craft_type.icon)
 		end
-		formspec = formspec.."label[5.5,"..(unified_inventory.formspec_y + 1)..";" .. minetest.formspec_escape(craft_type.description).."]"
-		formspec = formspec..stack_image_button(6.5, unified_inventory.formspec_y, 1.1, 1.1, "item_button_usage_", ItemStack(craft.output))
+		formspec = formspec.."label[6,"..(unified_inventory.formspec_y + 1)..";" .. minetest.formspec_escape(craft_type.description).."]"
+		formspec = formspec..stack_image_button(7, unified_inventory.formspec_y, 1.1, 1.1, "item_button_usage_", ItemStack(craft.output))
 		local display_size = craft_type.dynamic_display_size and craft_type.dynamic_display_size(craft) or { width = craft_type.width, height = craft_type.height }
 		local craft_width = craft_type.get_shaped_craft_width and craft_type.get_shaped_craft_width(craft) or display_size.width
 
 		-- This keeps recipes aligned to the right,
 		-- so that they're close to the arrow.
-		local xoffset = 1.5 + (3 - display_size.width)
+		local xoffset = 2 + (3 - display_size.width)
 		for y = 1, display_size.height do
 		for x = 1, display_size.width do
 			local item
@@ -292,10 +292,10 @@ unified_inventory.register_page("craftguide", {
 		end
 
 		if alternates and alternates > 1 then
-			formspec = formspec.."label[5.5,"..(unified_inventory.formspec_y + 1.6)..";"..recipe_text[dir].." "
+			formspec = formspec.."label[6,"..(unified_inventory.formspec_y + 1.6)..";"..recipe_text[dir].." "
 					..tostring(alternate).." of "
 					..tostring(alternates).."]"
-					.."button[5.5,"..(unified_inventory.formspec_y + 2)..";2,1;alternate;" .. S("Alternate") .. "]"
+					.."button[6,"..(unified_inventory.formspec_y + 2)..";2,1;alternate;" .. S("Alternate") .. "]"
 		end
 		return {formspec = formspec}
 	end,

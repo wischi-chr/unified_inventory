@@ -36,12 +36,12 @@ unified_inventory = {
 	-- "Lite" mode
 	lite_mode = minetest.setting_getbool("unified_inventory_lite"),
 
-	pagecols = 8,
-	pagerows = 10,
+	pagecols = 6,
+	pagerows = 11,
 	page_y = 0,
 	formspec_y = 1,
 	main_button_x = 0,
-	main_button_y = 9,
+	main_button_y = 10,
 	craft_result_x = 0.3,
 	craft_result_y = 0.5,
 	form_header_y = 0
